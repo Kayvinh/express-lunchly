@@ -13,8 +13,15 @@ const router = new express.Router();
 /** Homepage: show list of customers. */
 
 router.get("/", async function (req, res, next) {
+
+  if(req.query.search){
+    const customers = await Customer.searchName(req.query.search);
+    console.log("customer", customers);
+    return res.render("customer_list.html", { customers });
+
+  }
+
   const customers = await Customer.all();
-  
 
   return res.render("customer_list.html", { customers });
   // TODO:here
@@ -100,5 +107,7 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
 
   return res.redirect(`/${customerId}/`);
 });
+
+
 
 module.exports = router;
