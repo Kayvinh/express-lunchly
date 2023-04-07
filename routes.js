@@ -10,21 +10,22 @@ const Reservation = require("./models/reservation");
 
 const router = new express.Router();
 
-/** Homepage: show list of customers. */
+/** Homepage:
+ * If no query search, show entire list of customers.
+ * Otherwise, can filter customers by name
+*/
 
 router.get("/", async function (req, res, next) {
 
-  if(req.query.search){
+  if (req.query.search) {
     const customers = await Customer.searchName(req.query.search);
-    console.log("customer", customers);
-    return res.render("customer_list.html", { customers });
 
+    return res.render("customer_list.html", { customers });
   }
 
   const customers = await Customer.all();
 
   return res.render("customer_list.html", { customers });
-  // TODO:here
 });
 
 /** Form to add a new customer. */
@@ -46,6 +47,15 @@ router.post("/add/", async function (req, res, next) {
   return res.redirect(`/${customer.id}/`);
 });
 
+/** Show top ten customers that have the most reservations */
+
+router.get("/top-ten/", async function (req, res) {
+  const customers = await Customer.topTen();
+
+  return res.render("customer_top_ten.html", { customers });
+});
+
+
 /** Show a customer, given their ID. */
 
 router.get("/:id/", async function (req, res, next) {
@@ -54,7 +64,6 @@ router.get("/:id/", async function (req, res, next) {
   const reservations = await customer.getReservations();
 
   return res.render("customer_detail.html", { customer, reservations });
-  //TODO: here
 });
 
 /** Show form to edit a customer. */
@@ -91,7 +100,6 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
   const startAt = new Date(req.body.startAt);
   const numGuests = req.body.numGuests;
   const notes = req.body.notes;
-  console.log("CUSTOMER ID!!!!!", customerId);
 
   const reservation = new Reservation({
     customerId,
@@ -100,10 +108,7 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
     notes,
   });
 
-  console.log("inside new reservation!!!")
-  console.log(reservation);
   await reservation.save();
-  console.log(reservation.id);
 
   return res.redirect(`/${customerId}/`);
 });

@@ -49,9 +49,7 @@ class Reservation {
              RETURNING id`,
           [this.customerId, this.numGuests, this.startAt, this.notes],
       );
-      console.log("CUSTOMER ID!!!!!!!!", this.customerId)
       this.id = result.rows[0].id;
-      console.log("ID!!!!!!!!!!!!!!!!!", this.id)
     } else {
       await db.query(
             `UPDATE reservations

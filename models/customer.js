@@ -130,18 +130,17 @@ class Customer {
 
     if (firstAndLast.length === 1) {
       customer = await this.filterByOneWord(firstName);
-    }
-    else {
+    } else {
       lastName = lastName.charAt(0).toUpperCase() + lastName.slice(1);
 
       const result = await db.query(
         `SELECT id, 
-        first_name AS "firstName", 
-        last_name AS "lastName",
-        phone, notes
-      FROM customers
-      WHERE first_name LIKE $1 OR
-      last_name LIKE $2
+          first_name AS "firstName", 
+          last_name AS "lastName",
+          phone, notes
+        FROM customers
+        WHERE first_name LIKE $1 AND
+        last_name LIKE $2
       `,
         [`%${firstName}%`, `%${lastName}%`],
       );
@@ -150,8 +149,32 @@ class Customer {
 
     }
     return customer;
+  }
 
+  /**
+   * Queries database for customers who have the most reservations.
+   * Caps at 10 customers.
+   * 
+   * @returns [Customer{id...}, Customer{id...}]
+   */
 
+  static async topTen() {
+    const results = await db.query(
+      `SELECT c.id,
+          c.first_name AS "firstName",
+          c.last_name AS "lastName",
+          c.phone,
+          c.notes,
+          COUNT(*) as num_reservations
+          FROM customers AS c
+          JOIN reservations AS r ON c.id = r.customer_id
+          GROUP BY c.id
+          ORDER BY num_reservations DESC
+          LIMIT 10
+      `
+    );
+
+    return results.rows.map(c => new Customer(c));
   }
 }
 
