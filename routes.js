@@ -14,7 +14,10 @@ const router = new express.Router();
 
 router.get("/", async function (req, res, next) {
   const customers = await Customer.all();
+  
+
   return res.render("customer_list.html", { customers });
+  // TODO:here
 });
 
 /** Form to add a new customer. */
@@ -44,6 +47,7 @@ router.get("/:id/", async function (req, res, next) {
   const reservations = await customer.getReservations();
 
   return res.render("customer_detail.html", { customer, reservations });
+  //TODO: here
 });
 
 /** Show form to edit a customer. */
@@ -80,6 +84,7 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
   const startAt = new Date(req.body.startAt);
   const numGuests = req.body.numGuests;
   const notes = req.body.notes;
+  console.log("CUSTOMER ID!!!!!", customerId);
 
   const reservation = new Reservation({
     customerId,
@@ -87,7 +92,11 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
     numGuests,
     notes,
   });
+
+  console.log("inside new reservation!!!")
+  console.log(reservation);
   await reservation.save();
+  console.log(reservation.id);
 
   return res.redirect(`/${customerId}/`);
 });
