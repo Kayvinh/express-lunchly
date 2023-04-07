@@ -42,14 +42,12 @@ class Reservation {
 
   async save() {
     if (this.id === undefined) {
-      debugger;
       const result = await db.query(
-            `INSERT INTO reservations (customerId, numGuests, startAt, notes)
+            `INSERT INTO reservations (customer_id, numGuests, startAt, notes)
              VALUES ($1, $2, $3, $4)
              RETURNING id`,
           [this.customerId, this.numGuests, this.startAt, this.notes],
       );
-      debugger;
       console.log("CUSTOMER ID!!!!!!!!", this.customerId)
       this.id = result.rows[0].id;
       console.log("ID!!!!!!!!!!!!!!!!!", this.id)
